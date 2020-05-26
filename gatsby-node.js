@@ -3,5 +3,29 @@
  *
  * See: https://www.gatsbyjs.org/docs/node-apis/
  */
+const path = require("path")
 
-// You can delete this file if you're not using it
+module.exports.createPages = async ({ graphql, actions }) => {
+  const { createPage } = actions
+  const response = await graphql(`
+    query {
+      allContentfulBlogPost {
+        edges {
+          node {
+            slug
+          }
+        }
+      }
+    }
+  `)
+
+  response.data.allContentfulBlogPost.edges.forEach(edge => {
+    createPage({
+      path: `/blog/${edge.node.slug}`,
+      component: path.resolve("./src/templates/blog.js"),
+      context: {
+        slug: edge.node.slug,
+      },
+    })
+  })
+}
